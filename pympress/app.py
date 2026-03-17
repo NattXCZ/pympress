@@ -122,8 +122,13 @@ class Pympress(Gtk.Application):
     def quit(self, *args):  # noqa: A003 -- we need to override app.quit()
         """ Quit and ignore other arguments e.g. sent by signals.
         """
-        if self.gui is not None and self.gui.unsaved_changes():
-            return
+        if self.gui is not None:
+
+            if self.gui.unsaved_changes():
+                return
+
+            # before quitting, re-enable the screensaver
+            self.gui.set_screensaver(False)
 
         Gtk.Application.quit(self)
         return False

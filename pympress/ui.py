@@ -1618,20 +1618,22 @@ class UI(builder.Builder):
         """ Disable or re-enable the screensaver.
 
         Args:
-            disabled (`bool`): `True` iff the screensaver should be disabled, otherwise enabled.
+            disabled (`bool`): `True` if the screensaver should be disabled, otherwise enabled.
         """
         if not disabled:
             if self.inhibit_cookie:
                 self.app.uninhibit(self.inhibit_cookie)
+                logger.debug(f"Screensaver uninhibited. cookie={self.inhibit_cookie}")
             elif self.inhibit_cookie is not None:
                 util.hard_set_screensaver(disabled=False)
             self.inhibit_cookie = None
 
-        else:
+        elif not self.inhibit_cookie:
             flags = (Gtk.ApplicationInhibitFlags.LOGOUT | Gtk.ApplicationInhibitFlags.SWITCH |
                      Gtk.ApplicationInhibitFlags.SUSPEND | Gtk.ApplicationInhibitFlags.IDLE)
 
             self.inhibit_cookie = self.app.inhibit(self.c_win, flags, _("Fullscreen Presentation running"))
+            logger.debug(f"Screensaver inhibited. cookie={self.inhibit_cookie}")
 
             if not self.inhibit_cookie:
                 logger.warning(_('Gtk.Application.inhibit failed preventing screensaver, trying hard disabling'))
